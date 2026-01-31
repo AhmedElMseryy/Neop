@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreign('destination_account_id')->references('id')->on('accounts')->onDelete('cascade');
 
             $table->decimal('amount', 15, 2);
-            $table->string('currency', 3);
+            $table->string('currency', 3)->nullable();
 
             $table->string('status');
 

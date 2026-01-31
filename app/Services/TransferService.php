@@ -7,9 +7,11 @@ use App\Models\Transaction;
 use App\Repositories\Contracts\AccountRepositoryInterface;
 use App\Repositories\Contracts\TransactionRepositoryInterface;
 use App\Services\Transfer\TransferValidator;
+use GuzzleHttp\Exception\TransferException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 class TransferService
 {
@@ -29,53 +31,54 @@ class TransferService
         ?string $description = null
     ): Transaction
     {
-        return DB::transaction(function () use (
-            $sourceAccountId,
-            $destinationAccountId,
-            $amount,
-            $description
-        ) {
+        $transaction = $this->transactionRepository->create([
+            'transaction_reference' => $this->generateTransactionReference(),
+            'source_account_id' => $sourceAccountId,
+            'destination_account_id' => $destinationAccountId,
+            'amount' => $amount,
+            'status' => 'pending',
+            'description' => $description,
+        ]);
 
-            // 1. Lock accounts (Pessimistic Locking)
-            $sourceAccount = Account::where('id', $sourceAccountId)
-                ->lockForUpdate()
-                ->first();
+        try {
+            return DB::transaction(function () use (
+                $sourceAccountId,
+                $destinationAccountId,
+                $amount,
+                $transaction
+            ) {
 
-            $destinationAccount = Account::where('id', $destinationAccountId)
-                ->lockForUpdate()
-                ->first();
 
-            // 2. Validate transfer using Chain of Responsibility
-            $this->transferValidator->validate(
-                $sourceAccount,
-                $destinationAccount,
-                $amount
-            );
+                $sourceAccount = Account::where('id', $sourceAccountId)
+                    ->lockForUpdate()
+                    ->first();
 
-            // 3. Create transaction (pending)
-            $transaction = $this->transactionRepository->create([
-                'transaction_reference' => $this->generateTransactionReference(),
-                'source_account_id' => $sourceAccountId,
-                'destination_account_id' => $destinationAccountId,
-                'amount' => $amount,
-                'currency' => $sourceAccount->currency,
-                'status' => 'pending',
-                'description' => $description,
-                'source_balance_before' => $sourceAccount->balance,
-                'destination_balance_before' => $destinationAccount->balance,
-                'source_balance_after' => 0,
-                'destination_balance_after' => 0,
-            ]);
+                $destinationAccount = Account::where('id', $destinationAccountId)
+                    ->lockForUpdate()
+                    ->first();
 
-            try {
-                // 4. Perform transfer
+
+                $this->transferValidator->validate(
+                    $sourceAccount,
+                    $destinationAccount,
+                    $amount
+                );
+
+
+                $transaction->update([
+                    'currency' => $sourceAccount->currency,
+                    'source_balance_before' => $sourceAccount->balance,
+                    'destination_balance_before' => $destinationAccount->balance,
+                ]);
+
+
                 $sourceAccount->balance -= $amount;
                 $destinationAccount->balance += $amount;
 
                 $sourceAccount->save();
                 $destinationAccount->save();
 
-                // 5. Mark transaction as success
+
                 $transaction->update([
                     'status' => 'success',
                     'source_balance_after' => $sourceAccount->balance,
@@ -87,18 +90,26 @@ class TransferService
                     'sourceAccount',
                     'destinationAccount'
                 ]);
-            } catch (\Exception $e) {
+            });
 
-                // 6. Mark transaction as failed
-                $transaction->update([
-                    'status' => 'failed',
-                    'failure_reason' => $e->getMessage(),
-                    'processed_at' => now(),
-                ]);
+        } catch (TransferException $e) {
+            $transaction->update([
+                'status' => 'failed',
+                'failure_reason' => $e->getMessage(),
+                'processed_at' => now(),
+            ]);
 
-                throw $e;
-            }
-        });
+            throw $e;
+
+        } catch (Throwable $e) {
+            $transaction->update([
+                'status' => 'failed',
+                'failure_reason' => $e->getMessage(),
+                'processed_at' => now(),
+            ]);
+
+            throw $e;
+        }
     }
 
     #-------------------------------------------------------GET BY REFERENCE
