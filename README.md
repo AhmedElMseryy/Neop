@@ -61,3 +61,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## Postman
 Postman collection is available in `/postman` folder.
+
+## ERD
+Image ERD is available in `/ERD` folder.
