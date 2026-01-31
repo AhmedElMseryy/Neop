@@ -25,7 +25,6 @@ return new class extends Migration
             $table->string('currency', 3);
 
             $table->string('status');
-            $table->string('type');
 
             $table->text('description')->nullable();
 
@@ -34,6 +33,7 @@ return new class extends Migration
             $table->decimal('destination_balance_before', 15, 2)->nullable();
             $table->decimal('destination_balance_after', 15, 2)->nullable();
 
+            $table->timestamp('processed_at')->nullable();
             $table->text('failure_reason')->nullable();
             $table->timestamps();
         });

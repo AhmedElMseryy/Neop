@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\TransferController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -11,23 +12,21 @@ use Illuminate\Support\Facades\Route;
 
 
 // User Routes
-Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index']);
-    Route::post('/', [UserController::class, 'store']);
-    Route::get('/{id}', [UserController::class, 'show']);
-    Route::put('/{id}', [UserController::class, 'update']);
-    Route::delete('/{id}', [UserController::class, 'destroy']);
-});
-
+Route::apiResource('users', UserController::class);
 
 // Account Routes
-Route::prefix('accounts')->group(function () {
-    Route::get('/', [AccountController::class, 'index']);
-    Route::post('/', [AccountController::class, 'store']);
-    Route::get('/{id}', [AccountController::class, 'show']);
-    Route::put('/{id}', [AccountController::class, 'update']);
-    Route::post('/{id}/activate', [AccountController::class, 'activate']);
-});
+Route::apiResource('accounts', AccountController::class);
+Route::post('accounts/{account}/activate', [AccountController::class, 'activate']);
 
 // Get user accounts
-Route::get('users/{userId}/accounts', [AccountController::class, 'getUserAccounts']);
+Route::get('users/{user}/accounts', [AccountController::class, 'getUserAccounts']);
+
+// Transfer Routes
+Route::prefix('transfers')->group(function () {
+    Route::post('/', [TransferController::class, 'transfer']);
+    Route::post('/validate', [TransferController::class, 'validateTransfer']);
+    Route::get('/reference/{reference}', [TransferController::class, 'getByReference']);
+});
+
+// Transaction History
+Route::get('accounts/{accountId}/transactions', [TransferController::class, 'getAccountHistory']);

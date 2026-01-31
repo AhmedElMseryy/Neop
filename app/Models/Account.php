@@ -24,17 +24,24 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function outgoingTransactions(): HasMany
+    public function sentTransactions()
     {
         return $this->hasMany(Transaction::class, 'source_account_id');
     }
 
-    public function incomingTransactions(): HasMany
+    public function receivedTransactions()
     {
         return $this->hasMany(Transaction::class, 'destination_account_id');
     }
 
     #-------------------------------------------------------HELPER METHODS
+    public function transactions()
+    {
+        return Transaction::where('source_account_id', $this->id)
+            ->orWhere('destination_account_id', $this->id)
+            ->orderBy('created_at', 'desc');
+    }
+
     public function isActive(): bool
     {
         return $this->status === 'active';
@@ -43,11 +50,6 @@ class Account extends Model
     public function hasSufficientBalance(float $amount): bool
     {
         return $this->balance >= $amount;
-    }
-
-    public function freeze(): void
-    {
-        $this->update(['status' => 'frozen']);
     }
 
     public function activate(): void

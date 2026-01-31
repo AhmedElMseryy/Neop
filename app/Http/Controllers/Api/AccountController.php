@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateAccountRequest;
-use App\Http\Requests\UpdateAccountRequest;
+use App\Http\Requests\Account\CreateAccountRequest;
+use App\Http\Requests\Account\UpdateAccountRequest;
 use App\Http\Resources\AccountResource;
 use App\Services\AccountService;
-use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 
 class AccountController extends Controller
