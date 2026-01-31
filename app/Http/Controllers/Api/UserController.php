@@ -29,21 +29,13 @@ class UserController extends Controller
     #-------------------------------------------------------STORE
     public function store(CreateUserRequest $request): JsonResponse
     {
-        try {
-            $user = $this->userService->createUser($request->validated());
+        $user = $this->userService->createUser($request->validated());
 
-            return $this->successResponse(
-                data: new UserResource($user),
-                message: 'User created successfully',
-                code: 201
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                data: $e->getMessage(),
-                message: 'Failed to create user',
-                code: 500
-            );
-        }
+        return $this->successResponse(
+            data: new UserResource($user),
+            message: 'User created successfully',
+            code: 201
+        );
     }
 
     #-------------------------------------------------------SHOW
@@ -67,53 +59,24 @@ class UserController extends Controller
     #-------------------------------------------------------UPDATE
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        try {
-            $updated = $this->userService->updateUser($id, $request->validated());
+        $this->userService->updateUser($id, $request->validated());
 
-            if (!$updated) {
-                return $this->errorResponse(
-                    message: 'User not found',
-                    code: 404
-                );
-            }
+        $user = $this->userService->getUserWithAccounts($id);
 
-            $user = $this->userService->getUserWithAccounts($id);
-
-            return $this->successResponse(
-                data: new UserResource($user),
-                message: 'User updated successfully'
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                data: $e->getMessage(),
-                message: 'Failed to update user',
-                code: 500
-            );
-        }
+        return $this->successResponse(
+            data: new UserResource($user),
+            message: 'User updated successfully'
+        );
     }
 
     #-------------------------------------------------------DESTROY
     public function destroy(int $id): JsonResponse
     {
-        try {
-            $deleted = $this->userService->deleteUser($id);
+        $this->userService->deleteUser($id);
 
-            if (!$deleted) {
-                return $this->errorResponse(
-                    message: 'User not found',
-                    code: 404
-                );
-            }
-
-            return $this->successResponse(
-                message: 'User deleted successfully'
-            );
-        } catch (\Exception $e) {
-            return $this->errorResponse(
-                data: $e->getMessage(),
-                message: 'Failed to delete user',
-                code: 500
-            );
-        }
+        return $this->successResponse(
+            message: 'User deleted successfully'
+        );
     }
+
 }
