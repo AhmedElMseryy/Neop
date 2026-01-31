@@ -26,14 +26,14 @@ class TransferMoneyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'source_account_id.required' => 'حساب المرسل مطلوب',
-            'source_account_id.exists' => 'حساب المرسل غير موجود',
-            'destination_account_id.required' => 'حساب المستقبل مطلوب',
-            'destination_account_id.exists' => 'حساب المستقبل غير موجود',
-            'destination_account_id.different' => 'لا يمكن التحويل لنفس الحساب',
-            'amount.required' => 'المبلغ مطلوب',
-            'amount.numeric' => 'المبلغ يجب أن يكون رقماً',
-            'amount.min' => 'المبلغ يجب أن يكون أكبر من صفر',
+            'source_account_id.required' => 'Source account is required',
+            'source_account_id.exists' => 'Source account does not exist',
+            'destination_account_id.required' => 'Destination account is required',
+            'destination_account_id.exists' => 'Destination account does not exist',
+            'destination_account_id.different' => 'Cannot transfer to the same account',
+            'amount.required' => 'Amount is required',
+            'amount.numeric' => 'Amount must be a number',
+            'amount.min' => 'Amount must be greater than zero',
         ];
     }
 }

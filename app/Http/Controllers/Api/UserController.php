@@ -11,11 +11,8 @@ use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
-    protected UserService $userService;
-
-    public function __construct(UserService $userService)
+    public function __construct(protected UserService $userService)
     {
-        $this->userService = $userService;
     }
 
     #-------------------------------------------------------INDEX
@@ -42,8 +39,8 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to create user',
                 data: $e->getMessage(),
+                message: 'Failed to create user',
                 code: 500
             );
         }
@@ -88,8 +85,8 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to update user',
                 data: $e->getMessage(),
+                message: 'Failed to update user',
                 code: 500
             );
         }
@@ -113,8 +110,8 @@ class UserController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to delete user',
                 data: $e->getMessage(),
+                message: 'Failed to delete user',
                 code: 500
             );
         }

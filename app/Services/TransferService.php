@@ -13,27 +13,22 @@ use Illuminate\Support\Str;
 
 class TransferService
 {
-    protected AccountRepositoryInterface $accountRepository;
-    protected TransactionRepositoryInterface $transactionRepository;
-    protected TransferValidator $transferValidator;
-
     public function __construct(
-        AccountRepositoryInterface $accountRepository,
-        TransactionRepositoryInterface $transactionRepository,
-        TransferValidator $transferValidator
-    ) {
-        $this->accountRepository = $accountRepository;
-        $this->transactionRepository = $transactionRepository;
-        $this->transferValidator = $transferValidator;
+        protected AccountRepositoryInterface     $accountRepository,
+        protected TransactionRepositoryInterface $transactionRepository,
+        protected TransferValidator              $transferValidator
+    )
+    {
     }
 
     #-------------------------------------------------------TRANSFER
     public function transfer(
-        int $sourceAccountId,
-        int $destinationAccountId,
-        float $amount,
+        int     $sourceAccountId,
+        int     $destinationAccountId,
+        float   $amount,
         ?string $description = null
-    ): Transaction {
+    ): Transaction
+    {
         return DB::transaction(function () use (
             $sourceAccountId,
             $destinationAccountId,
@@ -88,18 +83,10 @@ class TransferService
                     'processed_at' => now(),
                 ]);
 
-                Log::info('Transfer successful', [
-                    'transaction_reference' => $transaction->transaction_reference,
-                    'amount' => $amount,
-                    'source_account' => $sourceAccountId,
-                    'destination_account' => $destinationAccountId,
-                ]);
-
                 return $transaction->fresh([
                     'sourceAccount',
                     'destinationAccount'
                 ]);
-
             } catch (\Exception $e) {
 
                 // 6. Mark transaction as failed
@@ -107,11 +94,6 @@ class TransferService
                     'status' => 'failed',
                     'failure_reason' => $e->getMessage(),
                     'processed_at' => now(),
-                ]);
-
-                Log::error('Transfer failed', [
-                    'transaction_reference' => $transaction->transaction_reference,
-                    'error' => $e->getMessage(),
                 ]);
 
                 throw $e;

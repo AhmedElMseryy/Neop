@@ -26,12 +26,12 @@ class CreateAccountRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'user_id.required' => 'معرف المستخدم مطلوب',
-            'user_id.exists' => 'المستخدم غير موجود',
-            'currency.required' => 'العملة مطلوبة',
-            'currency.in' => 'العملة غير مدعومة',
-            'balance.min' => 'الرصيد لا يمكن أن يكون سالباً',
-            'account_number.unique' => 'رقم الحساب مستخدم من قبل',
+            'user_id.required' => 'User ID is required',
+            'user_id.exists' => 'User does not exist',
+            'currency.required' => 'Currency is required',
+            'currency.in' => 'Currency is not supported',
+            'balance.min' => 'Balance cannot be negative',
+            'account_number.unique' => 'Account number has already been taken',
         ];
     }
 }

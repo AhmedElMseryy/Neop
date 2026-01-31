@@ -22,11 +22,6 @@ class TransactionRepository implements TransactionRepositoryInterface
             ->get();
     }
 
-    public function find(int $id): ?Transaction
-    {
-        return $this->model->with(['sourceAccount', 'destinationAccount'])->find($id);
-    }
-
     public function findByReference(string $reference): ?Transaction
     {
         return $this->model->with(['sourceAccount', 'destinationAccount'])
@@ -39,17 +34,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $this->model->create($data);
     }
 
-    public function update(int $id, array $data): bool
-    {
-        $transaction = $this->find($id);
-
-        if (!$transaction) {
-            return false;
-        }
-
-        return $transaction->update($data);
-    }
-
     public function getAccountTransactions(int $accountId): Collection
     {
         return $this->model->forAccount($accountId)
@@ -58,21 +42,4 @@ class TransactionRepository implements TransactionRepositoryInterface
             ->get();
     }
 
-    public function getSuccessfulTransactions(int $accountId): Collection
-    {
-        return $this->model->forAccount($accountId)
-            ->successful()
-            ->with(['sourceAccount', 'destinationAccount'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    public function getFailedTransactions(int $accountId): Collection
-    {
-        return $this->model->forAccount($accountId)
-            ->failed()
-            ->with(['sourceAccount', 'destinationAccount'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
 }

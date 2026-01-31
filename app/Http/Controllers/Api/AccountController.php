@@ -11,12 +11,8 @@ use Illuminate\Http\JsonResponse;
 
 class AccountController extends Controller
 {
-
-    protected AccountService $accountService;
-
-    public function __construct(AccountService $accountService)
+    public function __construct(protected AccountService $accountService)
     {
-        $this->accountService = $accountService;
     }
 
     #-------------------------------------------------------INDEX
@@ -43,8 +39,8 @@ class AccountController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to create account',
                 data: $e->getMessage(),
+                message: 'Failed to create account',
                 code: 500
             );
         }
@@ -100,8 +96,8 @@ class AccountController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to update account',
                 data: $e->getMessage(),
+                message: 'Failed to update account',
                 code: 500
             );
         }
@@ -120,8 +116,8 @@ class AccountController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to activate account',
                 data: $e->getMessage(),
+                message: 'Failed to activate account',
                 code: 500
             );
         }

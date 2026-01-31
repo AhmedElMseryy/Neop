@@ -10,11 +10,8 @@ use Illuminate\Http\JsonResponse;
 
 class TransferController extends Controller
 {
-    protected TransferService $transferService;
-
-    public function __construct(TransferService $transferService)
+    public function __construct(protected TransferService $transferService)
     {
-        $this->transferService = $transferService;
     }
 
     #-------------------------------------------------------TRANSFER
@@ -42,8 +39,8 @@ class TransferController extends Controller
         } catch (\Exception $e) {
             // Unexpected / system errors
             return $this->errorResponse(
-                message: 'Transfer failed',
                 data: config('app.debug') ? $e->getMessage() : null,
+                message: 'Transfer failed',
                 code: 400
             );
         }
@@ -79,8 +76,8 @@ class TransferController extends Controller
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                message: 'Failed to fetch transaction history',
                 data: config('app.debug') ? $e->getMessage() : null,
+                message: 'Failed to fetch transaction history',
                 code: 400
             );
         }

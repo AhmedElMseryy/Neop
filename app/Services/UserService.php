@@ -9,11 +9,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserService
 {
-    protected UserRepositoryInterface $userRepository;
-
-    public function __construct(UserRepositoryInterface $userRepository)
+    public function __construct(protected UserRepositoryInterface $userRepository)
     {
-        $this->userRepository = $userRepository;
     }
 
     public function getAllUsers(): Collection
