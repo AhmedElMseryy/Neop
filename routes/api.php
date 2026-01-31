@@ -24,7 +24,6 @@ Route::get('users/{user}/accounts', [AccountController::class, 'getUserAccounts'
 // Transfer Routes
 Route::prefix('transfers')->group(function () {
     Route::post('/', [TransferController::class, 'transfer']);
-    Route::post('/validate', [TransferController::class, 'validateTransfer']);
     Route::get('/reference/{reference}', [TransferController::class, 'getByReference']);
 });
 
