@@ -44,4 +44,12 @@ class Transaction extends Model
         return $this->belongsTo(Account::class, 'destination_account_id');
     }
 
+    #-------------------------------------------------------SCOPES
+    public function scopeForAccount($query, int $accountId)
+    {
+        return $query->where(function ($q) use ($accountId) {
+            $q->where('source_account_id', $accountId)
+                ->orWhere('destination_account_id', $accountId);
+        });
+    }
 }
