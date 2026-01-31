@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransferMoneyRequest;
-use App\Services\TransferService;
-use App\Traits\ApiResponse;
 use App\Http\Resources\TransactionResource;
+use App\Services\TransferService;
 use Illuminate\Http\JsonResponse;
 
 class TransferController extends Controller
 {
-
     protected TransferService $transferService;
 
     public function __construct(TransferService $transferService)
@@ -35,28 +33,20 @@ class TransferController extends Controller
                 message: 'Transfer completed successfully',
                 code: 201
             );
+        } catch (\DomainException $e) {
+            // Business validation errors (from Chain)
+            return $this->errorResponse(
+                message: $e->getMessage(),
+                code: 422
+            );
         } catch (\Exception $e) {
+            // Unexpected / system errors
             return $this->errorResponse(
                 message: 'Transfer failed',
-                data: $e->getMessage(),
+                data: config('app.debug') ? $e->getMessage() : null,
                 code: 400
             );
         }
-    }
-
-    #-------------------------------------------------------VALIDATE TRANSFER
-    public function validateTransfer(TransferMoneyRequest $request): JsonResponse
-    {
-        $validation = $this->transferService->validateTransfer(
-            $request->source_account_id,
-            $request->destination_account_id,
-            $request->amount
-        );
-
-        return $this->successResponse(
-            data: $validation,
-            message: $validation['valid'] ? 'Transfer is valid' : 'Transfer validation failed'
-        );
     }
 
     #-------------------------------------------------------GET BY REFERENCE
@@ -90,7 +80,8 @@ class TransferController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse(
                 message: 'Failed to fetch transaction history',
-                data: $e->getMessage()
+                data: config('app.debug') ? $e->getMessage() : null,
+                code: 400
             );
         }
     }
