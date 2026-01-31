@@ -15,13 +15,12 @@ class Transaction extends Model
         'currency',
         'status',
         'description',
-    ];
-
-    protected $guarded = [
         'source_balance_before',
         'source_balance_after',
         'destination_balance_before',
         'destination_balance_after',
+        'processed_at',
+        'failure_reason',
     ];
 
     #-------------------------------------------------------CASTS
